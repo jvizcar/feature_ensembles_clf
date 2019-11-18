@@ -4,6 +4,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import random
+from skimage.feature import hog
+import cv2
+
 
 
 LABEL_MAP = {
@@ -52,15 +55,42 @@ def load_batch(file_path, plot_sample=False):
 
 
 def plot_samples(X, Y):
-	"""Randomly plot CIFAR sample images given formatted numpy image data (X) and its label dataframe (Y). 
-	See load_batch(..) above for information about these inputs.
-		"""
-		# randomly select 9 images to plot with their labels
-	fig, ax = plt.subplots(ncols=3, nrows=3, figsize=(5,6))
-	ax = ax.ravel()
-	for i, idx in enumerate(random.sample(range(0, len(Y)), 9)):
-	    ax[i].imshow(X[idx, :, :, :], interpolation='bicubic')
-	    ax[i].set_title(Y.loc[idx, 'label_name'], fontsize=12)
-	    ax[i].set_yticklabels([])
-	    ax[i].set_xticklabels([])
-	plt.show()
+    """Randomly plot CIFAR sample images given formatted numpy image data (X) and its label dataframe (Y). 
+    See load_batch(..) above for information about these inputs.
+        """
+        # randomly select 9 images to plot with their labels
+    fig, ax = plt.subplots(ncols=3, nrows=3, figsize=(5,6))
+    ax = ax.ravel()
+    for i, idx in enumerate(random.sample(range(0, len(Y)), 9)):
+        ax[i].imshow(X[idx, :, :, :], interpolation='bicubic')
+        ax[i].set_title(Y.loc[idx, 'label_name'], fontsize=12)
+        ax[i].axis('off')
+    plt.show()
+
+    
+def extract_features(image, feature_type, limit=None):
+    """Extract image features from provided RGB image.
+    
+    :param image : ndarray
+        RGB image data
+    :param str : feature_type
+        type of features to extract
+    :param limit : int (default: None)
+        limit of image features to return, if None then return as many features as possible
+    
+    :return features : list
+        the list of image descriptors
+    """    
+    # extract feature
+    if feature_type == 'hog':
+        # convert image to grayscale
+        gray_im = cv2.cvtColor(image.copy() ,cv2.COLOR_RGB2GRAY)
+        features = hog(gray_im, orientations=9, pixels_per_cell=[8, 8], cells_per_block=[2, 2],
+                     block_norm='L2-Hys', visualize=False, transform_sqrt=True)
+        features = list(features)
+    else:
+        raise Exception('Feature type {} is not a valid descriptor to extract'.format(feature_type))
+        
+    if limit is not None:
+        features = features[:limit]
+    return features
