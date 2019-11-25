@@ -3,8 +3,6 @@
 
 modules/__pycache__/
 
-CIFAR10_Data/
-
 .idea/
 
 *.pyc
