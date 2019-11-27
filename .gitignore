@@ -1,5 +1,7 @@
 data/*
 
+!data/README.md
+
 .ipynb_checkpoints/
 
 modules/__pycache__/
@@ -7,5 +9,3 @@ modules/__pycache__/
 .idea/
 
 *.pyc
-
-CIFAR10_Data/

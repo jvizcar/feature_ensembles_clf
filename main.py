@@ -1,12 +1,12 @@
 """Run main script
 """
 import argparse
-from scripts import load_cifar_data
+from scripts import load_cifar10
 
 
 if __name__ == '__main__':
     # load data -- saves I_train.npy, I_test.npy, Y_train.npy, and Y_test.npy to data dir
-    load_cifar_data.run()
+    load_cifar10.run()
 
     # run preprocess
     # run model training
