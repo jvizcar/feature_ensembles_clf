@@ -1,13 +1,10 @@
 """functions used in this project"""
 import pickle
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 import random
 from skimage.feature import hog
 import cv2
-
-
 
 LABEL_MAP = {
     0: 'airplane',
@@ -36,11 +33,11 @@ def load_batch(file_path, plot_sample=False):
     :return Y : dataframe
         corresponding int and string labels for the images in X, where row i matches images X[i, :, :, :]
     """
+    # open data with byte encoding
     with open(file_path, 'rb') as fo:
         data = pickle.load(fo, encoding='bytes')
 
-    # reshape data to [image index, height, width, channel]
-    # to get any image i: X[i, :, :, :]
+    # reshape data to [image index, height, width, channel] - to get any image i: X[i, :, :, :]
     X = data[b'data'].reshape(10000, 3, 32, 32).transpose(0, 2, 3, 1)
 
     # return corresponding label dataframe with int and string labels
@@ -57,8 +54,8 @@ def load_batch(file_path, plot_sample=False):
 def plot_samples(X, Y):
     """Randomly plot CIFAR sample images given formatted numpy image data (X) and its label dataframe (Y). 
     See load_batch(..) above for information about these inputs.
-        """
-        # randomly select 9 images to plot with their labels
+    """
+    # randomly select 9 images to plot with their labels
     fig, ax = plt.subplots(ncols=3, nrows=3, figsize=(5,6))
     ax = ax.ravel()
     for i, idx in enumerate(random.sample(range(0, len(Y)), 9)):
