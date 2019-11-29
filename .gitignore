@@ -9,3 +9,4 @@ modules/__pycache__/
 .idea/
 
 *.pyc
+CIFAR10_Data/
