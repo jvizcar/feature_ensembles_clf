@@ -1,14 +1,22 @@
 """Run main script
 """
 import argparse
-from scripts import load_cifar10
+from scripts import load_cifar10, train_vgg16
+
+# train and test dir will be saved in DATA_DIR - if already there then it will not reload
+DATA_DIR = 'data/'
 
 
 if __name__ == '__main__':
-    # load data -- saves I_train.npy, I_test.npy, Y_train.npy, and Y_test.npy to data dir
-    load_cifar10.run()
+    # load CIFAR10 data
+    # load_cifar10.run(save_dir=DATA_DIR)
 
-    # run preprocess
-    # run model training
+    # train vgg16 model
+    train_vgg16.run(data_dir=DATA_DIR)
+
+
+    # model_train.run()
+
     # run model testing
+
     # run plotting results

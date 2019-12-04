@@ -9,3 +9,5 @@ modules/__pycache__/
 .idea/
 
 *.pyc
+
+models/
