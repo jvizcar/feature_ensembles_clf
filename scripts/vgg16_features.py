@@ -37,7 +37,7 @@ def run(data_dir, labels, **kwargs):
     classes = np.reshape(train_gen.classes, (-1, 1))
     train_data = np.hstack((predict, classes))
     _ = np.save(oj(data_dir, 'vgg16_train'), train_data)
-    
+    _ = np.save(oj(data_dir, 'vgg16_train_filenames'), train_gen.filenames)    
 
     # repeat for testing data
     test_dgen = ImageDataGenerator(preprocessing_function=preprocess_input, rescale=1./255)
@@ -53,3 +53,4 @@ def run(data_dir, labels, **kwargs):
     classes = np.reshape(test_gen.classes, (-1, 1))
     test_data = np.hstack((predict, classes))
     _ = np.save(oj(data_dir, 'vgg16_test'), test_data)
+    _ = np.save(oj(data_dir, 'vgg16_test_filenames'), test_gen.filenames)
