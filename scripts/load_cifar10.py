@@ -7,11 +7,8 @@ import os
 from os.path import join as oj
 import imageio
 
-# CIFAR10 labels to map int labels (list index) to string labels
-labels = ['airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
 
-
-def run(save_dir):
+def run(save_dir, labels):
     train_dir = oj(save_dir, 'train')
     if not os.path.isdir(train_dir):
         # load and format the raw training data
