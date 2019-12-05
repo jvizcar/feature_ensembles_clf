@@ -120,13 +120,15 @@ def run(data_dir, **kwargs):
     
     # create checkpoints for saving best model
     os.makedirs('models/', exist_ok=True)
-    checkpoint = ModelCheckpoint("models/vgg16_lr_{}_mom_{}_xaug_{}_gitLayers_{}_allFrozen_{}_decay_{}_allTrain_{}.h5".format(
+    checkpoint = ModelCheckpoint("models/VGG16_lr_{}_mom_{}_xaug_{}_gitLayers_{}_allFrozen_{}_decay_{}_allTrain_{}.h5".format(
                                      kwargs['learning_rate'], kwargs['momentum'], kwargs['extra_aug'], kwargs['paper_layers'],
                                      kwargs['all_frozen'], kwargs['decay'], kwargs['allTrainable']
                                  ),
                                  monitor='val_acc', verbose=1, save_best_only=True,
                                  save_weights_only=False, mode='auto', period=1)
-
+    
+    # early stopping
+    early = EarlyStopping(monitor='val_acc', patience=10, verbose=1, mode='auto')
 
     # load the VGG16 model from Keras directly
     model = load_model(**kwargs)
@@ -165,7 +167,7 @@ def run(data_dir, **kwargs):
             validation_data=val_gen,
             epochs=kwargs['epochs'],
             validation_steps=val_gen.samples // kwargs['batch_size'],
-            callbacks=[checkpoint],
+            callbacks=[checkpoint, early],
             shuffle=True
         )
         

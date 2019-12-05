@@ -41,5 +41,5 @@ def run(data_dir, labels):
 
     # save the outputs
     _ = np.save(oj(data_dir, 'flatten_train'), np.array(x_train))
-    _ = np.save(oj(data_dir, 'flatten_test'), np.array(x_test), )
+    _ = np.save(oj(data_dir, 'flatten_test'), np.array(x_test))
 

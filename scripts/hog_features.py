@@ -51,7 +51,4 @@ def run(data_dir, labels):
 
     # save the outputs
     _ = np.save(oj(data_dir, 'HOG_train'), np.array(x_train))
-    _ = np.save(oj(data_dir, 'HOG_test'), np.array(x_test),)
-
-    print(np.array(x_train).shape)
-    print(np.array(x_test).shape)
+    _ = np.save(oj(data_dir, 'HOG_test'), np.array(x_test))
