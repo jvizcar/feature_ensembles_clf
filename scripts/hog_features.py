@@ -1,54 +1,32 @@
 # extract training and testing hog features
-import os
-from os.path import join as oj
 import cv2
-import imageio
 from skimage.feature import hog
 import numpy as np
+from tensorflow.keras.datasets import cifar10
 
 
-def run(data_dir, labels):
-    x_train = []
-    x_test = []
+def hog_features(save_path):
+    (x_train, y_train), (x_test, y_test) = cifar10.load_data()
+    train_temp = []
+    test_temp = []
 
-    # loop through all the training files
-    train_dir = oj(data_dir, 'train')
-    for fld in os.listdir(train_dir):
-        class_dir = oj(train_dir, fld)
-        for filename in os.listdir(class_dir):
-            im_path = oj(class_dir, filename)
-            # read the image
-            im =imageio.imread(im_path)
+    for i in range(x_train.shape[0]):
+        # convert image to grayscale
+        gray_im = cv2.cvtColor(x_train[i].copy(), cv2.COLOR_RGB2GRAY)
+        features = hog(gray_im, orientations=9, pixels_per_cell=[8, 8], cells_per_block=[2, 2],
+                       block_norm='L2-Hys', visualize=False, transform_sqrt=True)
 
-            # convert image to grayscale
-            gray_im = cv2.cvtColor(im.copy(), cv2.COLOR_RGB2GRAY)
-            features = hog(gray_im, orientations=9, pixels_per_cell=[8, 8], cells_per_block=[2, 2],
-                           block_norm='L2-Hys', visualize=False, transform_sqrt=True)
-            features = list(features) + [labels.index(fld)]
+        train_temp.append(features)
+        
+    for i in range(x_test.shape[0]):
+        # convert image to grayscale
+        gray_im = cv2.cvtColor(x_test[i].copy(), cv2.COLOR_RGB2GRAY)
+        features = hog(gray_im, orientations=9, pixels_per_cell=[8, 8], cells_per_block=[2, 2],
+                       block_norm='L2-Hys', visualize=False, transform_sqrt=True)
 
-            x_train.append(features)
+        test_temp.append(features)
 
-    # repeat for testing data
-    test_dir = oj(data_dir, 'test')
-    for fld in os.listdir(test_dir):
-        class_dir = oj(test_dir, fld)
-        for filename in os.listdir(class_dir):
-            im_path = oj(class_dir, filename)
-            # read the image
-            im = imageio.imread(im_path)
-
-            # convert image to grayscale
-            gray_im = cv2.cvtColor(im.copy(), cv2.COLOR_RGB2GRAY)
-
-            # extract hog features
-            features = hog(gray_im, orientations=9, pixels_per_cell=[8, 8], cells_per_block=[2, 2],
-                           block_norm='L2-Hys', visualize=False, transform_sqrt=True)
-
-            # append the labels at the end
-            features = list(features) + [labels.index(fld)]
-
-            x_test.append(features)
+    data = np.array(train_temp), y_train, np.array(test_temp), y_test
 
     # save the outputs
-    _ = np.save(oj(data_dir, 'HOG_train'), np.array(x_train))
-    _ = np.save(oj(data_dir, 'HOG_test'), np.array(x_test))
+    _ = np.save(save_path, data)
