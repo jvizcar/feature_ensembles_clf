@@ -15,6 +15,8 @@ import numpy as np
 from tensorflow.keras.models import load_model
 from skimage.transform import rescale, resize, downscale_local_mean
 from tensorflow.keras.regularizers import l2
+from sklearn.model_selection import StratifiedKFold
+
 
 class vgg16:
     def __init__(self, train=True, trainable='all', maxepoches=250, model_path='models/vgg16.h5', learning_rate=0.001):
@@ -154,3 +156,60 @@ class vgg16:
         
         # stack the labels as a column
         return features
+    
+    def train_kfold(self):
+        #training parameters
+        batch_size = self.batch_size
+        learning_rate = self.learning_rate
+        
+        # get the kfolds
+        kfold = StratifiedKFold(n_splits=5, shuffle=True, random_state=5)
+        histories = []
+        i = 0
+        for train_index, test_index in kfold.split(self.x_train, self.y_train):
+            i += 1
+            x_train = self.x_train[train_index]
+            y_train = self.y_train[train_index]
+            x_test = self.x_train[test_index]
+            y_test = self.y_train[test_index]
+            
+            y_train = keras.utils.to_categorical(y_train, self.num_classes)
+            y_test = keras.utils.to_categorical(y_test, self.num_classes)
+            
+            data_gen = ImageDataGenerator(
+                rescale=1./255,
+                horizontal_flip=True,  # horizontal flip is the only custom augmentation
+                preprocessing_function=preprocess_input
+            ) 
+
+            test_gen = ImageDataGenerator(
+                rescale=1./255,
+                preprocessing_function=preprocess_input            
+            )
+
+            data_gen.fit(x_train)
+            test_gen.fit(x_test)
+            
+            model = self.build_model()
+            
+            # compile the model
+            sgd = optimizers.SGD(lr=learning_rate, momentum=0.9)
+            model.compile(loss="categorical_crossentropy", optimizer=sgd, metrics=["accuracy"])
+
+            # early stopping
+            fold_path = self.model_path.replace('.h5', '') + '_fold{}.h5'.format(i)
+            early = EarlyStopping(monitor='val_accuracy', patience=10, verbose=1, mode='auto')
+            checkpoint = ModelCheckpoint(fold_path, monitor='val_accuracy', verbose=1, 
+                                    save_best_only=True, save_weights_only=False, mode='auto')
+
+            historytemp = model.fit_generator(
+                data_gen.flow(x_train, y_train, batch_size=batch_size),
+                steps_per_epoch=x_train.shape[0] // batch_size,
+                epochs=self.maxepoches, 
+                validation_data=test_gen.flow(x_test, y_test, shuffle=False),
+                callbacks=[checkpoint, early],
+                validation_steps=x_test.shape[0] // batch_size)
+            historytemp = historytemp.__dict__
+            del historytemp['model']
+            histories.append(historytemp)
+        _ = np.save(self.model_path.replace('.h5', '_kfolds.npy'), histories) 

@@ -11,5 +11,6 @@ modules/__pycache__/
 *.pyc
 CIFAR10_Data/
 
+archive/
 
 models/
