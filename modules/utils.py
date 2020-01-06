@@ -44,7 +44,7 @@ def plot_confusion_matrix(model, labels=LABELS, title='', save_path=None):
         temp.append(np.argmax(pred_y[i]))
     y_pred = temp
     
-    fig = plt.figure(figsize=(10,10))
+    fig = plt.figure(figsize=(17, 17))
     ax = fig.add_subplot(111)
     mat = confusion_matrix(y_true=y_true, y_pred=y_pred).astype(float)
     sns.heatmap(mat.T, square=True, annot=True, fmt='0.0f',
@@ -53,9 +53,11 @@ def plot_confusion_matrix(model, labels=LABELS, title='', save_path=None):
                 vmin = 0, cmap='coolwarm', cbar=False,
                 ax = ax
                )
-    plt.xlabel('True', fontsize=15)
-    plt.ylabel('Predicted', fontsize=15)
-    plt.title(title, fontsize=18)
+    plt.yticks(rotation=45, fontsize=24)
+    plt.xticks(rotation=45, fontsize=24)
+    plt.xlabel('True', fontsize=24)
+    plt.ylabel('Predicted', fontsize=24)
+    plt.title(title, fontsize=24)
     
     if save_path is not None:
         plt.savefig(save_path, dpi=300)
